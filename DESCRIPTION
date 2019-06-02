@@ -15,4 +15,9 @@ Imports:
     reutils,
     biofiles,
     purrr,
-    future
+    future,
+    ape,
+    assertthat,
+    furrr,
+    jntools,
+    stringr
