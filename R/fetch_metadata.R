@@ -148,6 +148,8 @@ fetch_metadata_chunked <- function(
 #' doesn't tend to affect the results, but lower values have more accurate
 #' progress bars.
 #' @param max_tries Maximum number of times to attempt the loop.
+#' @param verbose Logical; should information about number of loops attempted
+#' be printed to the screen?
 #'
 #' @return Tibble of metadata resulting from Genbank query.
 #' Columns include: \describe{
@@ -167,13 +169,15 @@ fetch_metadata_chunked <- function(
 fetch_metadata <- function(
   query,
   chunk_size = 10,
-  max_tries = 10) {
+  max_tries = 10,
+  verbose = FALSE) {
 
   # Check input
   assertthat::assert_that(assertthat::is.string(query))
   assertthat::assert_that(assertthat::is.number(chunk_size))
   assertthat::assert_that(assertthat::is.number(max_tries))
   assertthat::assert_that(chunk_size < 200)
+  assertthat::assert_that(is.logical(verbose))
 
   # Do an initial search without downloading any IDs to see how many hits
   # we get.
@@ -209,7 +213,9 @@ fetch_metadata <- function(
 
     this_try <- this_try + 1
 
-    print(glue::glue("Fetching metadata, attempt {this_try} of {max_tries}"))
+    if(isTRUE(verbose)) {
+      print(glue::glue("Fetching metadata, attempt {this_try} of {max_tries}"))
+    }
 
     if(this_try > max_tries) {
       print(glue::glue("Exceeded maximum number of tries ({max_tries}), quitting."))

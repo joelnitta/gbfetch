@@ -4,7 +4,8 @@
 \alias{fetch_metadata}
 \title{Fetch metadata from GenBank}
 \usage{
-fetch_metadata(query, chunk_size = 10, max_tries = 10)
+fetch_metadata(query, chunk_size = 10, max_tries = 10,
+  verbose = FALSE)
 }
 \arguments{
 \item{query}{String used to query NCBI GenBank. For more about the NCBI
@@ -16,6 +17,9 @@ doesn't tend to affect the results, but lower values have more accurate
 progress bars.}
 
 \item{max_tries}{Maximum number of times to attempt the loop.}
+
+\item{verbose}{Logical; should information about number of loops attempted
+be printed to the screen?}
 }
 \value{
 Tibble of metadata resulting from Genbank query.
