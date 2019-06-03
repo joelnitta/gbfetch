@@ -4,13 +4,13 @@
 \alias{fetch_gene}
 \title{Extract a gene sequence from a genbank file}
 \usage{
-fetch_gene(gene_name, gb_file, rename = TRUE, detect_dups = TRUE)
+fetch_gene(gene_name, rec, rename = TRUE, detect_dups = TRUE)
 }
 \arguments{
 \item{gene_name}{Name of gene to extract. Must match genbank data exactly,
 case-sensitive.}
 
-\item{gb_file}{efetch object; full genbank record downloaded using reutils::efetch().
+\item{rec}{An instance of the gbRecord class.
 Typically a (sub)genome containing the gene of interest.}
 
 \item{rename}{Logical; should the sequence be renamed as "accession-gene"?}
@@ -32,16 +32,12 @@ See https://github.com/gschofl/biofiles
 }
 \examples{
 \dontrun{
-Cystopteris_protrusa_plastome <- reutils::efetch("KP136830",
-"nuccore", rettype = "gbwithparts", retmode = "text")
-fetch_gene("rbcL", Cystopteris_protrusa_plastome)
 
-Diplazium_striatum_plastome <- reutils::efetch("KY427346",
-"nuccore", rettype = "gbwithparts", retmode = "text")
-
-fetch_gene("psbA", Diplazium_striatum_plastome)
-fetch_gene("psbA", Diplazium_striatum_plastome, detect_dups = FALSE)
-fetch_gene("psbA", Diplazium_striatum_plastome, rename = FALSE, detect_dups = FALSE)
+gb_file <- reutils::efetch(uid = "KY427346", db = "nuccore",
+  rettype = "gbwithparts", retmode = "text")
+# Parse GenBank record text file
+this_rec <- biofiles::gbRecord(gb_file)
+fetch_gene("rbcL", this_rec)
 }
 
 }

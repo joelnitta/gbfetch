@@ -20,4 +20,9 @@ Imports:
     assertthat,
     furrr,
     jntools,
-    stringr
+    stringr,
+    dplyr,
+    glue,
+    rentrez,
+    taxize,
+    tibble

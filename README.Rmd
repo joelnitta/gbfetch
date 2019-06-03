@@ -1,0 +1,108 @@
+---
+output:
+  github_document:
+    html_preview: false
+editor_options: 
+  chunk_output_type: console
+---
+# gbtools
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+`gbtools` makes it easy to download DNA sequences from GenBank directly into R.
+
+## Installation
+
+`gbtools` is only available on GitHub, and must be installed with `devtools` or `remotes`.
+
+```{r install, eval=FALSE}
+devtools::install_github("joelnitta/gbtools")
+```
+
+## Dependencies
+
+Most R packages `gbtools` depends on will be automatically detected and installed from [CRAN](https://cran.r-project.org/) if needed. However, the `biofiles` dependency is only availble from [BioConductor](https://bioconductor.org/) (with dependencies that are similarly only available from BioConductor). This should be installed before `gbtools` if you don't have it already.
+
+```{r install-dep, eval = FALSE}
+BiocManager::install("biofiles")
+```
+
+## GenBank API key
+
+The `fetch_sequences()` and `fetch_metadata()` functions in this package use `taxize` and `rentrez` functions under the hood to fetch taxonomic data and GenBank sequences. Although not required, enabling the [NCBI Entrez API key](https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/) will increase the number of requests you are allowed to make per second. This should be set up using `taxize::use_entrez()` prior to running `fetch_` functions or your query might get rejected and no sequences returned.
+
+## Large downloads
+
+I am not aware of an upper limit on the number of sequences that can be downloaded, but I haven't tried more than ca. 10,000 at a time (which takes just a few minutes with `fetch_sequences()`). `fetch_metadata()` takes significantly longer, because it uses `taxize` to obtain taxonomic data, which is rather slow. Obtaining the metadata for ca. 10,000 sequences might take up to an hour or so.
+
+Trying to fetch too many sequenes might result in your IP address getting rejected by the API (at least temporarily), so use with caution!
+
+## Data format
+
+Sequence data are stored using the `DNAbin` class from the `ape` package. If you work with BioConductor packages that use the `DNAString` class, they will need to be converted.
+
+## Examples
+
+(See notes above about setting your API key before running these)
+
+### Fetch sequences and metadata
+
+Download all *rbcL* sequences for *Crepidomanes minutum*. The query string is formatted exactly as if we were searching on [GenBank](https://www.ncbi.nlm.nih.gov/nucleotide/). 
+
+Though you don't need to do this in practice, I will use `tictoc` to give an idea of how long this query takes.
+
+```{r example-1}
+library(gbtools)
+library(tictoc) # Optional; for timing the example
+
+query_string <- "Crepidomanes minutum[ORGN] AND rbcl[Gene]"
+
+tic() # Set a timer
+
+fetch_sequences(query_string)
+
+toc() # See how long it took
+```
+
+Download associated metadata for the sequences.
+
+```{r example-2}
+tic() # Set a timer
+
+fetch_metadata(query_string)
+
+toc()
+```
+
+### Assemble a set of genes from genomes
+
+The number of whole or partial genomes in GenBank is increasing rapidly. Although the `fetch_sequnces` function is useful for downloading small (e.g., single gene) sequences, we may also want to download multiple genes from a single genome or genomes. That is where `fetch_gene_from_genome` comes in.
+
+Let's download three genes of interest from the *Diplazium striatum* plastome, which has [GenBank accession number KY427346](https://www.ncbi.nlm.nih.gov/nuccore/KY427346).
+
+```{r example-3}
+# KY427346 is the GenBank accession no. for the Diplazium striatum plastome
+
+tic() # Set a timer
+
+genes_to_get <- c("rbcL", "matK", "psbA")
+fetch_gene_from_genome(genes_to_get, "KY427346")
+
+toc()
+```
+
+Scaling up, `assemble_gene_set` can assemble multiple genes of interest from multiple genomes into a list. Let's get the same three genes for *Cystopteris protrusa* (GenBank accession no. KP136830) and *Diplazium striatum*.
+
+```{r example-4}
+# KY427346 is the GenBank accession no. for the Diplazium striatum plastome
+
+tic() # Set a timer
+
+assemble_gene_set(
+  accessions = c("KP136830", "KY427346"), 
+  genes = genes_to_get)
+
+toc()
+```

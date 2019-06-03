@@ -2,4 +2,7 @@
 
 export("%>%")
 export(assemble_gene_set)
+export(fetch_gene_from_genome)
+export(fetch_metadata)
+export(fetch_sequences)
 importFrom(magrittr,"%>%")

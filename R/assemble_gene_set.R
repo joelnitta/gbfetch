@@ -8,7 +8,7 @@
 #'
 #' @param gene_name Name of gene to extract. Must match genbank data exactly,
 #' case-sensitive.
-#' @param gb_file efetch object; full genbank record downloaded using reutils::efetch().
+#' @param rec An instance of the gbRecord class.
 #' Typically a (sub)genome containing the gene of interest.
 #' @param rename Logical; should the sequence be renamed as "accession-gene"?
 #' @param detect_dups Logical; should duplicates be detected? If TRUE, a text
@@ -16,31 +16,29 @@
 #' in the genome; if false, all copies will be returned.
 #'
 #' @return object of class DNAbin
-#'
 #' @examples
 #' \dontrun{
-#' Cystopteris_protrusa_plastome <- reutils::efetch("KP136830",
-#' "nuccore", rettype = "gbwithparts", retmode = "text")
-#' fetch_gene("rbcL", Cystopteris_protrusa_plastome)
 #'
-#' Diplazium_striatum_plastome <- reutils::efetch("KY427346",
-#' "nuccore", rettype = "gbwithparts", retmode = "text")
-#'
-#' fetch_gene("psbA", Diplazium_striatum_plastome)
-#' fetch_gene("psbA", Diplazium_striatum_plastome, detect_dups = FALSE)
-#' fetch_gene("psbA", Diplazium_striatum_plastome, rename = FALSE, detect_dups = FALSE)
+#' gb_file <- reutils::efetch(uid = "KY427346", db = "nuccore",
+#'   rettype = "gbwithparts", retmode = "text")
+#' # Parse GenBank record text file
+#' this_rec <- biofiles::gbRecord(gb_file)
+#' fetch_gene("rbcL", this_rec)
 #' }
 #'
-fetch_gene <- function (gene_name, gb_file, rename = TRUE, detect_dups = TRUE) {
+fetch_gene <- function (gene_name, rec, rename = TRUE, detect_dups = TRUE) {
 
-  # Parse genbank text file
-  rec <- biofiles::gbRecord(gb_file)
+  # Check input
+  assertthat::assert_that(assertthat::is.string(gene_name))
+  assertthat::assert_that(inherits(rec, what = "gbRecord"))
+
+  pattern <- paste0("^", gene_name, "$")
 
   # Filter for the gene of interest
-  gene <- biofiles::filter(rec, key = "gene", gene = paste0("^", gene_name, "$"))
+  filtered_rec <- biofiles::filter(rec, key = "gene", gene = pattern)
 
   # Extract the sequence
-  seq <- biofiles::getSequence(biofiles::ft(gene))
+  seq <- biofiles::getSequence(biofiles::ft(filtered_rec))
 
   # If no gene detected, return NULL.
   if(is.null(seq)) return (NULL)
@@ -67,9 +65,10 @@ fetch_gene <- function (gene_name, gb_file, rename = TRUE, detect_dups = TRUE) {
 
 #' Extract a list of gene sequences from a genbank file
 #'
-#' @param gene_vec Vector of gene names to extract.
-#' @param gb_file efetch object; full genbank record downloaded using reutils::efetch().
-#' Typically a (sub)genome containing the gene of interest.
+#' @param gene Characte vector; gene names to extract.
+#' @param accession String; GenBank accession number of (full or partial) genome
+#' containing the gene(s) of interest.
+#' @param rename Logical; should the sequence be renamed as "accession-gene"?
 #' @param detect_dups Logical; should duplicates be detected? If TRUE, a text
 #' warning will be returned in the case that this gene has duplicate copies
 #' in the genome instead of the sequence; if false, all copies will be returned,
@@ -79,24 +78,41 @@ fetch_gene <- function (gene_name, gb_file, rename = TRUE, detect_dups = TRUE) {
 #'
 #' @examples
 #' \dontrun{
-#' Cystopteris_protrusa_plastome <- reutils::efetch("KP136830",
-#' "nuccore", rettype = "gbwithparts", retmode = "text")
+#' # KY427346 is the GenBank accession no. for the Diplazium striatum plastome
+#' # https://www.ncbi.nlm.nih.gov/nuccore/KY427346
+#'
 #' genes_to_get <- c("rbcL", "matK", "psbA")
-#' fetch_gene_list(Cystopteris_protrusa_plastome, genes_to_get)
 #'
-#' Diplazium_striatum_plastome <- reutils::efetch("KY427346",
-#' "nuccore", rettype = "gbwithparts", retmode = "text")
-#'
-#' fetch_gene_list(Diplazium_striatum_plastome, genes_to_get)
-#' fetch_gene_list(Diplazium_striatum_plastome, genes_to_get, detect_dups = FALSE)
+#' fetch_gene_from_genome(genes_to_get, "KY427346")
 #' }
 #'
-fetch_gene_list <- function (gb_file, gene_vec, detect_dups = TRUE) {
-  assertthat::assert_that(is.character(gene_vec))
-  assertthat::assert_that(inherits(gb_file, what = "efetch"))
-  names(gene_vec) <- gene_vec
-  purrr::map(gene_vec, fetch_gene, gb_file = gb_file,
-             rename = TRUE, detect_dups = detect_dups)
+#' @export
+fetch_gene_from_genome <- function (gene, accession, rename = TRUE, detect_dups = TRUE) {
+
+  # Check input
+  assertthat::assert_that(is.character(gene))
+  assertthat::assert_that(assertthat::is.string(accession))
+  assertthat::assert_that(is.logical(rename))
+  assertthat::assert_that(is.logical(detect_dups))
+
+  # Download GenBank record as text
+  # (do this before the loop so it isn't downloaded
+  # each time for every gene).
+  gb_file <- reutils::efetch(
+    uid = accession, db = "nuccore",
+    rettype = "gbwithparts", retmode = "text")
+
+  # Parse GenBank record text file
+  rec <- biofiles::gbRecord(gb_file)
+
+  # Use purrr to "vectorize" fetch_gene, and return output named by gene.
+  if(length(gene) > 1) {
+    gene %>% magrittr::set_names(., gene) %>%
+      purrr::map(fetch_gene,
+                 rec = rec, rename = rename, detect_dups = detect_dups)
+  } else {
+    fetch_gene(gene, rec = rec, rename = rename, detect_dups = detect_dups)
+  }
 }
 
 #' Assemble a list of genes from annotated genbank files
@@ -145,30 +161,30 @@ fetch_gene_list <- function (gb_file, gene_vec, detect_dups = TRUE) {
 #' }
 #'
 #' @export
-assemble_gene_set <- function (accessions, genes, parallel = FALSE, drop_dups = TRUE) {
+assemble_gene_set <- function (accessions, genes,
+                               parallel = FALSE, drop_dups = TRUE) {
 
   assertthat::assert_that(is.character(accessions))
   assertthat::assert_that(is.character(genes))
   assertthat::assert_that(is.logical(parallel))
-
-  # Download genbank files for all accessions (plastomes)
-  gb_files <-
-    accessions %>%
-    purrr::set_names(.) %>%
-    purrr::map(reutils::efetch,
-               db = "nuccore", rettype = "gbwithparts", retmode = "text")
 
   # Extract target genes from each plastome.
   # Wei et al 2017 data (83 coding genes from 40 plastomes)
   # took 23 min using furrr with four CPUs.
   # future::plan("multiprocess")
   if (isTRUE(parallel)) {
-    all_genes <- furrr::future_map(gb_files, fetch_gene_list,
-                                   gene_vec = genes, detect_dups = drop_dups) %>%
+    all_genes <- furrr::future_map(
+      accessions,
+      ~ fetch_gene_from_genome(
+        accession = ., gene = genes, detect_dups = drop_dups, rename = TRUE)
+    ) %>%
       purrr::transpose()
   } else {
-    all_genes <- purrr::map(gb_files, fetch_gene_list,
-                            gene_vec = genes, detect_dups = drop_dups) %>%
+    all_genes <- purrr::map(
+      accessions,
+      ~ fetch_gene_from_genome(
+        accession = ., gene = genes, detect_dups = drop_dups, rename = TRUE)
+    ) %>%
       purrr::transpose()
   }
 
@@ -195,7 +211,8 @@ assemble_gene_set <- function (accessions, genes, parallel = FALSE, drop_dups = 
     purrr::keep(~ length(.x) > 0) %>%
     # Remove redundant names
     purrr::map(~ purrr::set_names(., NULL)) %>%
-    # Convert each list of sequence lists within a gene into a single list per gene
+    # Convert each list of sequence lists within a gene
+    # into a single list per gene
     purrr::map(jntools::flatten_DNA_list)
 
 }
