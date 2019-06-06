@@ -40,11 +40,17 @@ returned.
 
 ## Large downloads
 
+This package is meant for downloading moderate amounts of data, **not**
+whole swaths of GenBank. If you want to access large amounts of data,
+the [restez](https://ropensci.github.io/restez/index.html) or
+[biomartr](https://github.com/ropensci/biomartr) packages might be
+better options.
+
 I am not aware of an upper limit on the number of sequences that can be
 downloaded, but I haven’t tried more than ca. 10,000 at a time (which
 takes just a few minutes with `fetch_sequences()`). `fetch_metadata()`
-takes significantly longer, because it uses `taxize` to obtain taxonomic
-data, which is rather slow. Obtaining the metadata for ca. 10,000
+takes significantly longer, because it uses `taxize` to get species
+names, which is rather slow. Obtaining the metadata for ca. 10,000
 sequences might take up to an hour or so.
 
 Trying to fetch too many sequenes might result in your IP address
@@ -55,7 +61,34 @@ caution\!
 
 Sequence data are stored using the `DNAbin` class from the `ape`
 package. If you work with BioConductor packages that use the `DNAString`
-class, they will need to be converted.
+class, they will need to be converted. I’m not aware of a
+`as.DNAString()` function that can do this, so [I wrote
+one](https://gist.github.com/joelnitta/6f30a7c0f1c83d78c76a5469e935d56f).
+
+## Similar work
+
+[rentrez](https://github.com/ropensci/rentrez) (which `gbfetch` uses
+under the hood) has much more sophisticated capabilities for querying
+NCBI databases.
+
+The [ape](http://ape-package.ird.fr/) package has a function,
+[read.GenBank()](https://www.rdocumentation.org/packages/ape/versions/5.3/topics/read.GenBank)
+that can read in a DNA sequence from GenBank given its accession number.
+
+[restez](https://ropensci.github.io/restez/index.html) allows you to
+download entire chunks of GenBank for querying locally. This is almost
+certainly the way to go if you are interested in downloading lots of
+data.
+
+[biomartr](https://github.com/ropensci/biomartr) is designed for
+downloading and working with whole genomes on GenBank.
+
+[phylotaR](https://github.com/ropensci/phylotaR) queries GenBank for a
+taxonomic group of interest and automatically assembles a set of
+orthologous loci for phylogenetic analysis.
+
+[PyPHLAWD](https://github.com/FePhyFoFum/PyPHLAWD) is a Python pipeline
+for assembling a set of loci for phylogenetic analysis.
 
 ## Examples
 
@@ -105,7 +138,7 @@ fetch_sequences(query_string)
 toc() # See how long it took
 ```
 
-    ## 1.744 sec elapsed
+    ## 1.856 sec elapsed
 
 Download associated metadata for the sequences.
 
@@ -114,8 +147,6 @@ tic() # Set a timer
 
 fetch_metadata(query_string)
 ```
-
-    ## Fetching metadata, attempt 1 of 10
 
     ## Registered S3 method overwritten by 'crul':
     ##   method                 from
@@ -140,15 +171,15 @@ fetch_metadata(query_string)
 toc()
 ```
 
-    ## 20.94 sec elapsed
+    ## 24.086 sec elapsed
 
 ### Assemble a set of genes from genomes
 
 The number of whole or partial genomes in GenBank is increasing rapidly.
-Although the `fetch_sequnces` function is useful for downloading small
-(e.g., single gene) sequences, we may also want to download multiple
-genes from a single genome or genomes. That is where
-`fetch_gene_from_genome` comes in.
+Although `fetch_sequnces()` is useful for downloading small (e.g.,
+single gene) sequences, we may also want to download multiple genes from
+a single genome or genomes. That is where `fetch_gene_from_genome()`
+comes in.
 
 Let’s download three genes of interest from the *Diplazium striatum*
 plastome, which has [GenBank accession number
@@ -196,11 +227,12 @@ fetch_gene_from_genome(genes_to_get, "KY427346")
 toc()
 ```
 
-    ## 6.025 sec elapsed
+    ## 6.014 sec elapsed
 
-Scaling up, `assemble_gene_set` can assemble multiple genes of interest
-from multiple genomes into a list. Let’s get the same three genes for
-*Cystopteris protrusa* (GenBank accession no. KP136830) and *Diplazium
+Scaling up, `assemble_gene_set()` can assemble multiple genes of
+interest from multiple genomes into a list. Let’s get the same three
+genes for *Cystopteris protrusa* (GenBank accession no. KP136830) and
+*Diplazium
 striatum*.
 
 ``` r
@@ -249,4 +281,4 @@ assemble_gene_set(
 toc()
 ```
 
-    ## 4.362 sec elapsed
+    ## 4.223 sec elapsed
