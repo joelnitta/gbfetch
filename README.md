@@ -1,26 +1,26 @@
 
-# gbtools
+# gbfetch
 
-`gbtools` makes it easy to download DNA sequences from GenBank directly
+`gbfetch` makes it easy to download DNA sequences from GenBank directly
 into R.
 
 ## Installation
 
-`gbtools` is only available on GitHub, and must be installed with
+`gbfetch` is only available on GitHub, and must be installed with
 `devtools` or `remotes`.
 
 ``` r
-devtools::install_github("joelnitta/gbtools")
+devtools::install_github("joelnitta/gbfetch")
 ```
 
 ## Dependencies
 
-Most R packages `gbtools` depends on will be automatically detected and
+Most R packages `gbfetch` depends on will be automatically detected and
 installed from [CRAN](https://cran.r-project.org/) if needed. However,
 the `biofiles` dependency is only availble from
 [BioConductor](https://bioconductor.org/) (with dependencies that are
 similarly only available from BioConductor). This should be installed
-before `gbtools` if you don’t have it already.
+before `gbfetch` if you don’t have it already.
 
 ``` r
 BiocManager::install("biofiles")
@@ -71,7 +71,7 @@ Though you don’t need to do this in practice, I will use `tictoc` to
 give an idea of how long this query takes.
 
 ``` r
-library(gbtools)
+library(gbfetch)
 library(tictoc) # Optional; for timing the example
 
 query_string <- "Crepidomanes minutum[ORGN] AND rbcl[Gene]"
