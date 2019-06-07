@@ -28,16 +28,13 @@
 #'
 fetch_gene <- function (gene_name, rec, rename = TRUE, detect_dups = TRUE) {
 
-  requires("reutils")
-  requires("biofiles")
-
   # Check for reutils
   if (!requireNamespace("reutils", quietly = TRUE)) {
     stop("Package \"reutils\" needed for this function to work. Please install it.",
          call. = FALSE)
   }
 
-  # Check for reutils
+  # Check for biofiles
   if (!requireNamespace("biofiles", quietly = TRUE)) {
     stop("Package \"biofiles\" needed for this function to work. Please install it.",
          call. = FALSE)
@@ -104,16 +101,13 @@ fetch_gene <- function (gene_name, rec, rename = TRUE, detect_dups = TRUE) {
 #' @export
 fetch_gene_from_genome <- function (gene, accession, rename = TRUE, detect_dups = TRUE) {
 
-  requires("reutils")
-  requires("biofiles")
-
   # Check for reutils
     if (!requireNamespace("reutils", quietly = TRUE)) {
       stop("Package \"reutils\" needed for this function to work. Please install it.",
            call. = FALSE)
     }
 
-  # Check for reutils
+  # Check for biofiles
     if (!requireNamespace("biofiles", quietly = TRUE)) {
       stop("Package \"biofiles\" needed for this function to work. Please install it.",
            call. = FALSE)
