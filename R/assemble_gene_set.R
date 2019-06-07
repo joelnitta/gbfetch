@@ -28,6 +28,21 @@
 #'
 fetch_gene <- function (gene_name, rec, rename = TRUE, detect_dups = TRUE) {
 
+  requires("reutils")
+  requires("biofiles")
+
+  # Check for reutils
+  if (!requireNamespace("reutils", quietly = TRUE)) {
+    stop("Package \"reutils\" needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+
+  # Check for reutils
+  if (!requireNamespace("biofiles", quietly = TRUE)) {
+    stop("Package \"biofiles\" needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+
   # Check input
   assertthat::assert_that(assertthat::is.string(gene_name))
   assertthat::assert_that(inherits(rec, what = "gbRecord"))
@@ -88,6 +103,21 @@ fetch_gene <- function (gene_name, rec, rename = TRUE, detect_dups = TRUE) {
 #'
 #' @export
 fetch_gene_from_genome <- function (gene, accession, rename = TRUE, detect_dups = TRUE) {
+
+  requires("reutils")
+  requires("biofiles")
+
+  # Check for reutils
+    if (!requireNamespace("reutils", quietly = TRUE)) {
+      stop("Package \"reutils\" needed for this function to work. Please install it.",
+           call. = FALSE)
+    }
+
+  # Check for reutils
+    if (!requireNamespace("biofiles", quietly = TRUE)) {
+      stop("Package \"biofiles\" needed for this function to work. Please install it.",
+           call. = FALSE)
+    }
 
   # Check input
   assertthat::assert_that(is.character(gene))
