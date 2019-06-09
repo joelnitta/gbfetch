@@ -2,7 +2,15 @@
 
 language: r
 r:
-  - 3.5
-  - bioc-devel
+  - bioc-release
 cache: packages
 use_bioc: true
+
+bioc_packages:
+  - BiocGenerics
+  - Biostrings
+  - GenomeInfoDb
+  - GenomicRanges
+  - IRanges
+  - S4Vectors
+  - XVector
