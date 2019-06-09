@@ -27,3 +27,5 @@ Imports:
 Suggests: 
     reutils,
     biofiles
+Remotes:
+    joelnitta/jntools
