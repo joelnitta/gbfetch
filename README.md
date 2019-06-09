@@ -1,6 +1,12 @@
 
 # gbfetch
 
+<!-- badges: start -->
+
+[![Travis build
+status](https://travis-ci.org/joelnitta/gbfetch.svg?branch=master)](https://travis-ci.org/joelnitta/gbfetch)
+<!-- badges: end -->
+
 `gbfetch` makes it easy to download DNA sequences from
 [GenBank](https://www.ncbi.nlm.nih.gov/genbank/) directly into R.
 
@@ -151,7 +157,7 @@ fetch_sequences(query_string)
 toc() # See how long it took
 ```
 
-    ## 2.199 sec elapsed
+    ## 2.243 sec elapsed
 
 Download associated metadata for the sequences.
 
@@ -184,7 +190,7 @@ fetch_metadata(query_string)
 toc()
 ```
 
-    ## 51.659 sec elapsed
+    ## 32.878 sec elapsed
 
 ### Assemble a set of genes from genomes
 
@@ -240,7 +246,7 @@ fetch_gene_from_genome(genes_to_get, "KY427346")
 toc()
 ```
 
-    ## 6.815 sec elapsed
+    ## 5.392 sec elapsed
 
 Scaling up, `assemble_gene_set()` can assemble multiple genes of
 interest from multiple genomes into a list. Let’s get the same three
@@ -294,4 +300,4 @@ assemble_gene_set(
 toc()
 ```
 
-    ## 4.874 sec elapsed
+    ## 3.732 sec elapsed

@@ -7,6 +7,10 @@ editor_options:
 ---
 # gbfetch
 
+<!-- badges: start -->
+[![Travis build status](https://travis-ci.org/joelnitta/gbfetch.svg?branch=master)](https://travis-ci.org/joelnitta/gbfetch)
+<!-- badges: end -->
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
