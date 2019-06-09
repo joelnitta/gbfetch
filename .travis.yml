@@ -3,5 +3,6 @@
 language: r
 r:
   - 3.5
+  - bioc-devel
 cache: packages
 use_bioc: true
