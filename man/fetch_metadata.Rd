@@ -53,5 +53,7 @@ until it finishes or the number of repeats reaches `max_tries`, upon
 which it quits with an error.
 }
 \examples{
+\dontrun{
 fetch_metadata("rbcl[Gene] AND Crepidomanes[ORGN]")
+}
 }

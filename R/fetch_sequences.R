@@ -64,7 +64,9 @@ fetch_seqs_from_id <- function (id, simple_names = TRUE, .pb = NULL) {
 #' @return List
 #'
 #' @examples
+#' \dontrun{
 #' fetch_sequences("Crepidomanes minutum[ORGN] AND rbcl[Gene]")
+#' }
 #' @export
 fetch_sequences <- function(query, simple_names = TRUE, chunk_size = 100, .pb = NULL, ...) {
 

@@ -32,7 +32,6 @@ See https://github.com/gschofl/biofiles
 }
 \examples{
 \dontrun{
-
 gb_file <- reutils::efetch(uid = "KY427346", db = "nuccore",
   rettype = "gbwithparts", retmode = "text")
 # Parse GenBank record text file

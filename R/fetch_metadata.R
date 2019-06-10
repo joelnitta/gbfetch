@@ -164,7 +164,9 @@ fetch_metadata_chunked <- function(
 #'   \item{species}{Species name}
 #' }
 #' @examples
+#' \dontrun{
 #' fetch_metadata("rbcl[Gene] AND Crepidomanes[ORGN]")
+#' }
 #' @export
 fetch_metadata <- function(
   query,

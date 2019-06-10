@@ -40,5 +40,7 @@ IDs are used as input (more than 200-300 or so). Therefore, \code{fetch_sequence
 splits the IDs into chunks (a list of vectors), and loops over the list.
 }
 \examples{
+\dontrun{
 fetch_sequences("Crepidomanes minutum[ORGN] AND rbcl[Gene]")
+}
 }
