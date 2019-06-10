@@ -1,5 +1,5 @@
 
-# gbfetch
+# gbfetch <img src="man/figures/gbfetch.png" width="120" align="right" />
 
 <!-- badges: start -->
 
@@ -157,7 +157,7 @@ fetch_sequences(query_string)
 toc() # See how long it took
 ```
 
-    ## 2.243 sec elapsed
+    ## 2.193 sec elapsed
 
 Download associated metadata for the sequences.
 
@@ -190,7 +190,7 @@ fetch_metadata(query_string)
 toc()
 ```
 
-    ## 32.878 sec elapsed
+    ## 25.967 sec elapsed
 
 ### Assemble a set of genes from genomes
 
@@ -246,7 +246,7 @@ fetch_gene_from_genome(genes_to_get, "KY427346")
 toc()
 ```
 
-    ## 5.392 sec elapsed
+    ## 7.626 sec elapsed
 
 Scaling up, `assemble_gene_set()` can assemble multiple genes of
 interest from multiple genomes into a list. Let’s get the same three
@@ -300,4 +300,4 @@ assemble_gene_set(
 toc()
 ```
 
-    ## 3.732 sec elapsed
+    ## 6.044 sec elapsed

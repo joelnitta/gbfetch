@@ -5,7 +5,7 @@ output:
 editor_options: 
   chunk_output_type: console
 ---
-# gbfetch
+# gbfetch <img src="man/figures/gbfetch.png" width="120" align="right" />
 
 <!-- badges: start -->
 [![Travis build status](https://travis-ci.org/joelnitta/gbfetch.svg?branch=master)](https://travis-ci.org/joelnitta/gbfetch)
