@@ -1,11 +1,11 @@
 Package: gbfetch
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Fetch sequences from GenBank into R
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Author: Joel Nitta
+Maintainer: Joel Nitta <joelnitta@gmail.com>
+Description: Submit a query as if you were searching GenBank, and gbfetch will download the sequences into R.
+    It can also retrieve metadata in a tidy format (one row per sequence), and retrieve specific genes from genomes.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
