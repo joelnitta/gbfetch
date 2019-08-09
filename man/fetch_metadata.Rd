@@ -5,7 +5,7 @@
 \title{Fetch metadata from GenBank}
 \usage{
 fetch_metadata(query, chunk_size = 10, max_tries = 10,
-  verbose = FALSE)
+  verbose = FALSE, higher_taxa = FALSE)
 }
 \arguments{
 \item{query}{String used to query NCBI GenBank. For more about the NCBI
@@ -19,7 +19,10 @@ progress bars.}
 \item{max_tries}{Maximum number of times to attempt the loop.}
 
 \item{verbose}{Logical; should information about number of loops attempted
-be printed to the screen?}
+be printed to the screen}
+
+\item{higher_taxa}{Logical; should higher taxonomic ranks (family and order)
+be included in the results?}
 }
 \value{
 Tibble of metadata resulting from Genbank query.

@@ -31,18 +31,21 @@ name_from_classification <- function (taxonomy, rank_select) {
 #'   by |}
 #'   \item{subtype}{Column names of misc. data, separated by |}
 #' }
+#' @param higher_taxa Logical; should higher taxonomic ranks (family and order)
+#' be included in the results?
 #' @param .pb Internal agument used for setting the progress bar; don't change this.
 #'
 #' @return Tibble
 #'
 #' @examples
 #' \dontrun{
-#' fetch_metadata_from_id("383212727")
+#' fetch_metadata_from_id("383212727", higher_taxa = TRUE)
 #' fetch_metadata_from_id(c("383212727", "383212725"))
 #' }
 fetch_metadata_from_id <- function (
   id,
   col_select = c("gi", "caption", "taxid", "title", "slen", "subtype", "subname"),
+  higher_taxa = FALSE,
   .pb = NULL) {
 
   # Check input
@@ -66,15 +69,32 @@ fetch_metadata_from_id <- function (
   # The metadata from rentrez::entrez_summary() don't include proper taxonomy.
   # There is a taxid field though, which we can use to lookup taxonomy with
   # taxize.
-  dplyr::mutate(
-    rentrez_results,
-    taxonomy = taxize::classification(taxid, db = "ncbi"),
-    species = purrr::map_chr(
-      taxonomy,
-      name_from_classification,
-      rank_select = "species")
-  ) %>%
-    dplyr::select(-taxonomy)
+  results <-
+    dplyr::mutate(
+      rentrez_results,
+      taxonomy = taxize::classification(taxid, db = "ncbi"),
+      species = purrr::map_chr(
+        taxonomy,
+        name_from_classification,
+        rank_select = "species")
+    )
+
+  if (isTRUE(higher_taxa)) {
+    results <-
+      dplyr::mutate(
+        results,
+        family = purrr::map_chr(
+          taxonomy,
+          name_from_classification,
+          rank_select = "family"),
+        order = purrr::map_chr(
+          taxonomy,
+          name_from_classification,
+          rank_select = "order")
+      )
+  }
+
+  dplyr::select(results, -taxonomy)
 
 }
 
@@ -87,6 +107,8 @@ fetch_metadata_from_id <- function (
 #' Output of rentrez::entrez_search().
 #' @param col_select Vector of column names to return.
 #' @param chunk_size Number of rows to use for each chunk.
+#' @param higher_taxa Logical; should higher taxonomic ranks (family and order)
+#' be included in the results?
 #'
 #' @return A list of two items, `results` and `error`.
 #'
@@ -97,6 +119,7 @@ fetch_metadata_from_id <- function (
 fetch_metadata_chunked <- function(
   id,
   col_select = c("gi", "caption", "taxid", "title", "slen", "subtype", "subname"),
+  higher_taxa = FALSE,
   chunk_size = 100) {
 
   # Check input
@@ -117,8 +140,11 @@ fetch_metadata_chunked <- function(
   # Loop over vector chunks
   purrr::map(
     id_list,
-    fetch_metadata_from_id_safely,
-    .pb = pb)
+    ~fetch_metadata_from_id_safely(
+      id = .,
+      higher_taxa = higher_taxa,
+      .pb = pb),
+    )
 
 }
 
@@ -149,7 +175,9 @@ fetch_metadata_chunked <- function(
 #' progress bars.
 #' @param max_tries Maximum number of times to attempt the loop.
 #' @param verbose Logical; should information about number of loops attempted
-#' be printed to the screen?
+#' be printed to the screen
+#' @param higher_taxa Logical; should higher taxonomic ranks (family and order)
+#' be included in the results?
 #'
 #' @return Tibble of metadata resulting from Genbank query.
 #' Columns include: \describe{
@@ -172,7 +200,8 @@ fetch_metadata <- function(
   query,
   chunk_size = 10,
   max_tries = 10,
-  verbose = FALSE) {
+  verbose = FALSE,
+  higher_taxa = FALSE) {
 
   # Check input
   assertthat::assert_that(assertthat::is.string(query))
@@ -227,7 +256,8 @@ fetch_metadata <- function(
     this_result <-
       fetch_metadata_chunked(
         id = working_id,
-        chunk_size = chunk_size) %>%
+        chunk_size = chunk_size,
+        higher_taxa = higher_taxa) %>%
       purrr::transpose() %>%
       magrittr::extract("result") %>%
       purrr::flatten() %>%

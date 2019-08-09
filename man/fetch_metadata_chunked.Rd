@@ -5,13 +5,17 @@
 \title{Fetch metadata from GenBank sequences in chunks}
 \usage{
 fetch_metadata_chunked(id, col_select = c("gi", "caption", "taxid",
-  "title", "slen", "subtype", "subname"), chunk_size = 100)
+  "title", "slen", "subtype", "subname"), higher_taxa = FALSE,
+  chunk_size = 100)
 }
 \arguments{
 \item{id}{Character vector of IDs for GenBank records.
 Output of rentrez::entrez_search().}
 
 \item{col_select}{Vector of column names to return.}
+
+\item{higher_taxa}{Logical; should higher taxonomic ranks (family and order)
+be included in the results?}
 
 \item{chunk_size}{Number of rows to use for each chunk.}
 }

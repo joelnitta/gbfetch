@@ -5,7 +5,8 @@
 \title{Fetch metadata for a GenBank sequence}
 \usage{
 fetch_metadata_from_id(id, col_select = c("gi", "caption", "taxid",
-  "title", "slen", "subtype", "subname"), .pb = NULL)
+  "title", "slen", "subtype", "subname"), higher_taxa = FALSE,
+  .pb = NULL)
 }
 \arguments{
 \item{id}{Character vector of IDs for GenBank records.
@@ -25,6 +26,9 @@ can be included. Default values include:
   \item{subtype}{Column names of misc. data, separated by |}
 }}
 
+\item{higher_taxa}{Logical; should higher taxonomic ranks (family and order)
+be included in the results?}
+
 \item{.pb}{Internal agument used for setting the progress bar; don't change this.}
 }
 \value{
@@ -41,7 +45,7 @@ e.g. rentrez::entrez_summary(db = "nucleotide", id = "383212727")
 }
 \examples{
 \dontrun{
-fetch_metadata_from_id("383212727")
+fetch_metadata_from_id("383212727", higher_taxa = TRUE)
 fetch_metadata_from_id(c("383212727", "383212725"))
 }
 }
