@@ -43,9 +43,15 @@ fetch_gene <- function (gene_name, rec, rename = TRUE, detect_dups = TRUE) {
   assertthat::assert_that(assertthat::is.string(gene_name))
   assertthat::assert_that(inherits(rec, what = "gbRecord"))
 
-  pattern <- paste0("^", gene_name, "$")
+  # Check that there are "gene" records
+  num_gene_features <- biofiles::filter(rec, key = "gene") %>% biofiles::getFeatures() %>% length()
+
+  # If no genes detected, return NULL.
+  if (num_gene_features == 0) return (NULL)
 
   # Filter for the gene of interest
+  pattern <- paste0("^", gene_name, "$")
+
   filtered_rec <- biofiles::filter(rec, key = "gene", gene = pattern)
 
   # Extract the sequence
@@ -101,16 +107,16 @@ fetch_gene <- function (gene_name, rec, rename = TRUE, detect_dups = TRUE) {
 fetch_gene_from_genome <- function (gene, accession, rename = TRUE, detect_dups = TRUE) {
 
   # Check for reutils
-    if (!requireNamespace("reutils", quietly = TRUE)) {
-      stop("Package \"reutils\" needed for this function to work. Please install it.",
-           call. = FALSE)
-    }
+  if (!requireNamespace("reutils", quietly = TRUE)) {
+    stop("Package \"reutils\" needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
 
   # Check for biofiles
-    if (!requireNamespace("biofiles", quietly = TRUE)) {
-      stop("Package \"biofiles\" needed for this function to work. Please install it.",
-           call. = FALSE)
-    }
+  if (!requireNamespace("biofiles", quietly = TRUE)) {
+    stop("Package \"biofiles\" needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
 
   # Check input
   assertthat::assert_that(is.character(gene))
