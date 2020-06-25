@@ -72,25 +72,16 @@ fetch_metadata_from_id <- function (
   results <-
     dplyr::mutate(
       rentrez_results,
-      taxonomy = taxize::classification(taxid, db = "ncbi"),
-      species = purrr::map_chr(
-        taxonomy,
-        name_from_classification,
-        rank_select = "species")
+      taxonomy = purrr::map(taxid, ~taxize::classification(., db = "ncbi") %>% magrittr::extract2(1)),
+      species = purrr::map_chr(taxonomy, ~name_from_classification(., rank_select = "species"))
     )
 
   if (isTRUE(higher_taxa)) {
     results <-
       dplyr::mutate(
         results,
-        family = purrr::map_chr(
-          taxonomy,
-          name_from_classification,
-          rank_select = "family"),
-        order = purrr::map_chr(
-          taxonomy,
-          name_from_classification,
-          rank_select = "order")
+        family = purrr::map_chr(taxonomy, ~name_from_classification(., rank_select = "family")),
+        order = purrr::map_chr(taxonomy, ~name_from_classification(., rank_select = "order"))
       )
   }
 
