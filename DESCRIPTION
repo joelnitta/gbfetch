@@ -28,5 +28,5 @@ Suggests:
     reutils,
     biofiles
 Remotes:
-    gschofl/biofiles
+    gschofl/biofiles,
     joelnitta/jntools
